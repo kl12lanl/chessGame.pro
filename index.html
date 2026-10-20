@@ -60,6 +60,7 @@
             align-items: center;
             gap: 10px;
             transition: background 0.2s;
+            width: 100%;
         }
 
         .nav-btn:hover, .nav-btn.active {
@@ -152,14 +153,6 @@
         .square.light { background-color: var(--board-light); color: #769656; }
         .square.dark { background-color: var(--board-dark); color: #eeeed2; }
         .square.selected { background-color: rgba(247, 148, 29, 0.6) !important; }
-        .square.hint::after {
-            content: "";
-            width: 16px;
-            height: 16px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 50%;
-            position: absolute;
-        }
 
         .game-sidebar {
             width: 300px;
@@ -183,7 +176,7 @@
             border-left: 4px solid var(--brand-green);
         }
 
-        /* Кнопки общего стиля */
+        /* Кнопки */
         .btn-chess {
             background-color: var(--brand-green);
             color: white;
@@ -200,7 +193,7 @@
         .btn-chess:active { transform: translateY(3px); box-shadow: 0 1px 0 #5b8733; }
         .btn-chess.admin { background-color: var(--accent-orange); box-shadow: 0 4px 0 #b86d14; }
 
-        /* Всплывающий ИИ-Ассистент */
+        /* ИИ-Ассистент */
         .ai-fab {
             position: fixed;
             bottom: 20px;
@@ -250,7 +243,6 @@
             gap: 8px;
         }
 
-        /* Панель ручного бана */
         .ban-console {
             background: #1f1e1c;
             padding: 15px;
@@ -271,37 +263,261 @@
 </head>
 <body>
 
-    <!-- БОКОВОЕ МЕНЮ НАВИГАЦИИ -->
     <div class="sidebar">
-        <h2>♟️ CHESS MONOLITH</h2>
-        <button class="nav-btn active" onclick="switchTab('dashboard')">🏠 Главная</button>
-        <button class="nav-btn" onclick="switchTab('game-lobby')">⚔️ Зал Игры</button>
-        <button class="nav-btn" onclick="switchTab('stats-panel')">📊 Статистика</button>
-        <button class="nav-btn" onclick="switchTab('admin-panel')">🛡️ Админ-Панель</button>
+        <h2>♟️ MONOLITH</h2>
+        <button id="nav-dashboard" class="nav-btn active" onclick="switchTab('dashboard')">🏠 Главная</button>
+        <button id="nav-game-lobby" class="nav-btn" onclick="switchTab('game-lobby')">⚔️ Зал Игры</button>
+        <button id="nav-stats-panel" class="nav-btn" onclick="switchTab('stats-panel')">📊 Статистика</button>
+        <button id="nav-admin-panel" class="nav-btn" onclick="switchTab('admin-panel')">🛡️ Админ-Панель</button>
         <div style="margin-top: auto; padding: 10px; background: #1f1e1c; border-radius: 4px; font-size: 12px; text-align: center;">
-            Текущий Игрок:<br><strong id="current-username-lbl" style="color:var(--brand-green);">Magnus_User</strong>
+            Игрок: <br><strong id="current-username-lbl" style="color:var(--brand-green);">Magnus_User</strong>
         </div>
     </div>
 
-    <!-- ОСНОВНОЕ ОКНО С ТАБАМИ -->
     <div class="main-content">
         
-        <!-- ТАБ 1: ДАШБОРД (ГЛАВНАЯ СТАРТОВАЯ ПАНЕЛЬ) -->
         <div id="tab-dashboard" class="tab-content active">
-            <h1 style="margin-top: 0;">Добро пожаловать в Шахматный Монолит!</h1>
-            <p style="color: var(--text-muted); margin-bottom: 25px;">Выберите игровой режим или откройте вспомогательные панели поддержки.</p>
-            
+            <h1 style="margin-top: 0;">Шахматный Мега-Портал</h1>
             <div class="dashboard-grid">
                 <div class="dashboard-card" onclick="startNewMatch('human')">
                     <div class="card-badge">Онлайн</div>
                     <h3 style="color: var(--brand-green)">Зал ожидания (Лобби)</h3>
-                    <p style="font-size: 14px; color: var(--text-muted);">Играйте с реальными пользователями со всего мира через симулированный стек шлюзов.</p>
+                    <p style="font-size: 14px; color: var(--text-muted);">Играйте с реальными соперниками.</p>
                 </div>
                 <div class="dashboard-card" onclick="startNewMatch('ai')">
                     <div class="card-badge" style="background: #457b9d">ИИ-Движок</div>
                     <h3 style="color: #457b9d">Игра с Компьютером</h3>
-                    <p style="font-size: 14px; color: var(--text-muted);">Испытайте себя против 6 ботов: от дедушки Мартина (250) до зловещего Мурзика (9999).</p>
+                    <p style="font-size: 14px; color: var(--text-muted);">Вызовите на дуэль одного из 6 ботов.</p>
                 </div>
-                <div class="dashboard-card" onclick="alert('Режим генерирует задачи под ваш ранг Elo!')">
-                    <div class="card-badge" style="background: #e9c46a; color: black;">Задачи</div>
-                    <h3 style="color: #e9c46a">Тактические задачи</h3>
+            </div>
+
+            <div style="background: var(--bg-dark-sidebar); border: 1px solid #403c38; border-radius: 6px; padding: 20px;">
+                <h3>💬 Общий чат платформы</h3>
+                <div id="global-chat-box" style="height: 150px; overflow-y: auto; background: #1f1e1c; padding: 10px; border-radius: 4px; font-size: 14px; margin-bottom: 10px;">
+                    <p><span style="color: var(--brand-green)">🤖 СИСТЕМА:</span> Добро пожаловать! Чат модерируется ИИ-модулями.</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="chat-msg-input" placeholder="Напишите сообщение..." style="flex-grow: 1; padding: 10px; background: #1f1e1c; border: 1px solid #403c38; color: white; border-radius: 4px;" />
+                    <button class="btn-chess" style="padding: 10px 20px;" onclick="sendGlobalChatMessage()">Отправить</button>
+                </div>
+                    <!-- ОРКЕСТРАТОР И ЛОГИКА ШАХМАТНОГО ПОРТАЛА (ВТОРАЯ ЧАСТЬ) -->
+    <script>
+        const PIECES_UNICODE = {
+            'white-king': '♔', 'white-queen': '♕', 'white-rook': '♖', 'white-bishop': '♗', 'white-knight': '♗', 'white-pawn': '♙',
+            'black-king': '♚', 'black-queen': '♛', 'black-rook': '♜', 'black-bishop': '♝', 'black-knight': '♞', 'black-pawn': '♟'
+        };
+
+        let gameState = {
+            board: Array(8).fill(null).map(() => Array(8).fill(null)),
+            turn: 'white',
+            selectedSquare: null,
+            history: [],
+            gameMode: 'ai', 
+            isBanned: false,
+            playerRating: 1500,
+            stats: { wins: 0, losses: 0, draws: 0 }
+        };
+
+        const bannedRegistry = new Set();
+
+        // 1. ИНИЦИАЛИЗАЦИЯ ШАХМАТНОЙ ДОСКИ
+        function initChessLogic() {
+            gameState.board = Array(8).fill(null).map(() => Array(8).fill(null));
+            const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
+            
+            for(let c = 0; c < 8; c++) {
+                gameState.board[0][c] = { type: backRow[c], color: 'black' };
+                gameState.board[1][c] = { type: 'pawn', color: 'black' };
+                gameState.board[6][c] = { type: 'pawn', color: 'white' };
+                gameState.board[7][c] = { type: backRow[c], color: 'white' };
+            }
+            gameState.turn = 'white';
+            gameState.selectedSquare = null;
+        }
+
+        // 2. ОТРИСОВКА КЛЕТОК И ФИГУР В БРАУЗЕРЕ
+        function renderBoard() {
+            const boardEl = document.getElementById('chess-board');
+            boardEl.innerHTML = '';
+
+            for(let r = 0; r < 8; r++) {
+                for(let c = 0; c < 8; c++) {
+                    const square = document.createElement('div');
+                    square.classList.add('square', (r + c) % 2 === 0 ? 'light' : 'dark');
+                    square.dataset.row = r;
+                    square.dataset.col = c;
+
+                    const piece = gameState.board[r][c];
+                    if(piece) {
+                        square.innerText = PIECES_UNICODE[`${piece.color}-${piece.type}`];
+                    }
+
+                    if(gameState.selectedSquare && gameState.selectedSquare.row === r && gameState.selectedSquare.col === c) {
+                        square.classList.add('selected');
+                    }
+
+                    square.onclick = () => handleSquareClick(r, c);
+                    boardEl.appendChild(square);
+                }
+            }
+        }
+
+        // 3. КОНТРОЛЛЕР ХОДОВ И ВАЛИДАЦИИ СИСТЕМЫ
+        function handleSquareClick(row, col) {
+            if (gameState.isBanned) {
+                alert('Доступ заблокирован! Ваш аккаунт находится в черном списке античита.');
+                return;
+            }
+
+            const piece = gameState.board[row][col];
+
+            if (gameState.selectedSquare) {
+                const from = gameState.selectedSquare;
+                
+                if (from.row === row && from.col === col) {
+                    gameState.selectedSquare = null;
+                    renderBoard();
+                    return;
+                }
+
+                // Симуляция перемещения фигуры на доске
+                const movingPiece = gameState.board[from.row][from.col];
+                gameState.board[row][col] = movingPiece;
+                gameState.board[from.row][from.col] = null;
+                
+                // Запись хода в стандартную нотацию
+                const moveSan = `${movingPiece.type === 'pawn' ? '' : movingPiece.type.toUpperCase()}${String.fromCharCode(97+col)}${8-row}`;
+                gameState.history.push(moveSan);
+                document.getElementById('pgn-log').innerText = gameState.history.join(', ');
+
+                gameState.selectedSquare = null;
+                
+                // Активация искусственного интеллекта соперника
+                if(gameState.gameMode === 'ai') {
+                    setTimeout(executeAiMove, 500);
+                }
+                
+                renderBoard();
+            } else {
+                if (piece && piece.color === 'white') {
+                    gameState.selectedSquare = { row, col };
+                    renderBoard();
+                }
+            }
+        }
+
+        // 4. СИМУЛЯТОР ДВИЖЕНИЯ ИИ БОТОВ (МАРТИН / МУРЗИК)
+        function executeAiMove() {
+            // Простейший алгоритм выбора хода черными вперед
+            for (let r = 0; r < 8; r++) {
+                for(let c = 0; c < 8; c++) {
+                    const piece = gameState.board[r][c];
+                    if (piece && piece.color === 'black') {
+                        const targetRow = r + 1;
+                        if(targetRow < 8 && !gameState.board[targetRow][c]) {
+                            gameState.board[targetRow][c] = piece;
+                            gameState.board[r][c] = null;
+                            gameState.history.push(`AI:${piece.type.toUpperCase()}${String.fromCharCode(97+c)}${8-targetRow}`);
+                            document.getElementById('pgn-log').innerText = gameState.history.join(', ');
+                            renderBoard();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 5. НАВИГАЦИЯ И УПРАВЛЕНИЕ ВКЛАДКАМИ СТРАНИЦ
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.getElementById(`nav-${tabId}-panel` ? `nav-${tabId}-panel` : `nav-${tabId}`).classList.add('active');
+        }
+
+        function startNewMatch(mode) {
+            gameState.gameMode = mode;
+            gameState.history = [];
+            document.getElementById('pgn-log').innerText = "Матч загружен в лобби...";
+            initChessLogic();
+            renderBoard();
+            
+            // Начисление базовой статистики
+            gameState.stats.wins++;
+            gameState.playerRating += 16;
+            updateStatsUI();
+
+            switchTab('game-lobby');
+        }
+
+        function resetCurrentGame() {
+            gameState.stats.losses++;
+            gameState.playerRating = Math.max(1000, gameState.playerRating - 14);
+            updateStatsUI();
+            initChessLogic();
+            renderBoard();
+            alert('Партия завершена. Изменения рейтинга сохранены в личный кабинет.');
+        }
+
+        function updateStatsUI() {
+            document.getElementById('stat-blitz').innerText = gameState.playerRating;
+            document.getElementById('stat-games').innerText = gameState.stats.wins + gameState.stats.losses;
+            document.getElementById('stat-wld').innerText = `В: ${gameState.stats.wins} | П: ${gameState.stats.losses} | Н: 0`;
+        }
+
+        // 6. ОБЩИЙ ЧАТ ПЛАТФОРМЫ
+        function sendGlobalChatMessage() {
+            const input = document.getElementById('chat-msg-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const chatBox = document.getElementById('global-chat-box');
+            chatBox.innerHTML += `<p><span style="color: var(--accent-orange)">Magnus_User (${gameState.playerRating}):</span> ${text}</p>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // 7. ИНСТРУМЕНТ РУЧНОГО БАНА ИЗ АДМИН-ПАНЕЛИ
+        function processManualBan() {
+            const input = document.getElementById('ban-user-input');
+            const consoleLog = document.getElementById('admin-log-output');
+            const targetUser = input.value.trim();
+
+            if(!targetUser) {
+                alert('Введите корректный никнейм!');
+                return;
+            }
+
+            bannedRegistry.add(targetUser.toLowerCase());
+            consoleLog.innerHTML += `<br>>> [УСПЕШНО] 🔨 Нарушитель "${targetUser}" заблокирован. Компенсация Elo отправлена игрокам.`;
+            input.value = '';
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+
+            if (targetUser.toLowerCase() === 'magnus_user') {
+                gameState.isBanned = true;
+                const lbl = document.getElementById('current-username-lbl');
+                lbl.style.color = 'red';
+                lbl.innerText = 'Magnus_User [ЗАБАНЕН]';
+            }
+        }
+
+        // 8. СЕМАНТИЧЕСКИЙ ИИ-ПОМОЩНИК И ЭКСКУРСОВОД
+        function toggleAiPanel() {
+            const panel = document.getElementById('ai-panel');
+            panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function askAiAssistant() {
+            const input = document.getElementById('ai-user-query');
+            const query = input.value.toLowerCase().trim();
+            if(!query) return;
+
+            const history = document.getElementById('ai-chat-history');
+            history.innerHTML += `<div style="background:var(--brand-green); color:black; padding:8px; border-radius:4px; margin-top:5px; align-self: flex-end; max-width: 80%;">${input.value}</div>`;
+            
+            let response = "Я вас не совсем понял. Я могу рассказать про 3 этапа защиты от DDoS, автобаны читеров, турниры Арены или правила!";
+
+            if(query.includes('защита') || query.includes('ддос') || query.includes('ddos')) {
+                response = "🛡️ Наша броня состоит из 3 этапов: L1 Rate Limiter по IP, L2 Поведенческий анализатор бот-сетей и L3 Криптографический барьер Proof-of-Work (PoW). Мы полностью неуязвимы!";
+            } else if (query.includes('бан') || query.includes('чит') || query.includes('судья')) {
